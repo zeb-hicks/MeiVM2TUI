@@ -714,7 +714,7 @@ impl App {
   }
 
   fn draw_code_view(&mut self, frame: &mut Frame, rect: Rect) {
-    let m = self.sim_state.memory[self.code_offset..(self.code_offset+0x60)].iter();
+    let m = self.sim_state.memory[self.code_offset..(self.code_offset+0xc0)].iter();
     let pc = self.sim_state.memory[0x3c] as usize;
     let mut lines = Vec::new();
     // let mut prev_was_pcinc = false;

@@ -223,6 +223,7 @@ fn sim(sim_rx: mpsc::Receiver<SimCommand>, sim_tx: mpsc::Sender<SimOutput>) {
       for i in 0..MEM_SHARED_SIZE_U {
         mem[i] = sim_vm.user_read(active_user, i as u16);
       }
+
       sim_tx.send(SimOutput::MemoryValues(active_user, 0, mem.clone())).unwrap();
       if let Some(user) = sim_vm.find_user(active_user) {
         sim_tx.send(SimOutput::SimState(active_user, SimStateUpdate {
