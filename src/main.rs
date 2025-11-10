@@ -14,7 +14,7 @@ use std::vec;
 // mod opcode;
 // mod register;
 
-use meivm2::{vm_write, FlightModule, NavModule, SimulationVM, VMShip, MEM_SHARED_SIZE_U};
+use meivm2::{FlightModule, MEM_SHARED_SIZE_U, NavModule, PhysicsEntity, Ship, SimulationVM, vm_write};
 use ratatui::crossterm::{event, execute};
 use std::sync::mpsc;
 use std::time::Duration;
@@ -51,7 +51,7 @@ enum SimOutput {
   ChangeUser(u64),
   Error(String),
   SimState(u64, SimStateUpdate),
-  ShipState(u64, VMShip),
+  ShipState(u64, Ship),
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -143,15 +143,15 @@ fn sim(sim_rx: mpsc::Receiver<SimCommand>, sim_tx: mpsc::Sender<SimOutput>) {
             SimCommand::WriteCommand(vals) => {
               let vals = &mut vals.split_whitespace();
               vals.next();
-              let vmproc = &mut sim_vm.make_user(active_user).proc;
-              vm_write(vals, vmproc.as_mut(), 0);
+              let user = &mut sim_vm.make_user(active_user);
+              vm_write(vals, user.as_mut(), 0, 0);
               // write_from_input(&mut sim_vm, 0, &vals);
             }
             SimCommand::CodeCommand(vals) => {
               let vals = &mut vals.split_whitespace();
               vals.next();
-              let vmproc = &mut sim_vm.make_user(active_user).proc;
-              vm_write(vals, vmproc.as_mut(), 0x40);
+              let user = &mut sim_vm.make_user(active_user);
+              vm_write(vals, user.as_mut(), 0, 0x40);
               // write_from_input(&mut sim_vm, 0x40, &vals);
             }
             SimCommand::Breakpoints(bps) => {
@@ -237,14 +237,16 @@ fn sim(sim_rx: mpsc::Receiver<SimCommand>, sim_tx: mpsc::Sender<SimOutput>) {
       }
     }
     let user = sim_vm.make_user(active_user);
-    let ship = VMShip {
+    let ship = Ship {
       flight: FlightModule {
         ..user.ship.flight
       },
       nav: NavModule {
         ..user.ship.nav
       },
-      ..user.ship
+      phy: PhysicsEntity {
+        ..user.ship.phy
+      }
     };
     sim_tx.send(SimOutput::ShipState(active_user, ship)).unwrap();
   }

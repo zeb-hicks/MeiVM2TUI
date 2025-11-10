@@ -1,5 +1,5 @@
 use meivm2::opcode::{Opcode, RegIndex};
-use meivm2::{FlightModule, MEM_SHARED_SIZE_U, VMShip};
+use meivm2::{FlightModule, MEM_SHARED_SIZE_U, Ship};
 use ratatui::crossterm::event;
 use ratatui::layout::{Alignment, Margin, Position, Rect};
 use ratatui::style::{Color, Modifier, Style, Stylize};
@@ -77,7 +77,7 @@ pub struct SimStateUpdate {
 
 pub struct App {
   sim_state: SimState,
-  ship: VMShip,
+  ship: Ship,
   ui_regions: UIRegions,
   mouse_pos: Option<Position>,
   mouse_clicks: Vec<Position>,
@@ -112,7 +112,7 @@ impl App {
         debug_mode: false,
         active_user: 0,
       },
-      ship: VMShip {
+      ship: Ship {
         flight: FlightModule::default(),
         ..Default::default()
       },
@@ -592,9 +592,9 @@ impl App {
           SimOutput::ShipState(_user, ship) => {
             // debug!("Ship state: {:?}", ship);
             // self.ship = ship;
-            self.ship.x = ship.x;
-            self.ship.y = ship.y;
-            self.ship.heading = ship.heading;
+            self.ship.phy.pos.x = ship.phy.pos.x;
+            self.ship.phy.pos.y = ship.phy.pos.y;
+            self.ship.phy.heading = ship.phy.heading;
             self.ship.flight.color = ship.flight.color;
 
             // ship_state_tx.send((ship, self.ui_regions.full)).unwrap();
@@ -674,7 +674,7 @@ impl App {
     // debug!("Ship: {:?}", self.ship);
     let ship = &self.ship;
 
-    let h = (ship.heading * 8f32 + (1f32/16f32)).floor() as u8;
+    let h = (ship.phy.heading * 8f32 + (1f32/16f32)).floor() as u8;
     let h = h % 8;
     let triangle = match h {
       0 => "⇑",
@@ -689,8 +689,8 @@ impl App {
     };
     let w = frame.area().width as f32;
     let h = frame.area().height as f32;
-    let x = (ship.x / 1920f32) * (w - 1f32);
-    let y = (ship.y / 1080f32) * (h - 1f32);
+    let x = (ship.phy.pos.x / 1920f32) * (w - 1f32);
+    let y = (ship.phy.pos.y / 1080f32) * (h - 1f32);
     let color = ship.flight.color;
     let color = color_from_value(color);
 
@@ -744,10 +744,10 @@ impl App {
       }
 
       if self.breakpoints.contains(&addr) {
-        spans.push("⬤".to_string().red());
+        spans.push("●".to_string().red());
       } else {
         if mouse_over {
-          spans.push("⬤".to_string().dark_gray());
+          spans.push("●".to_string().dark_gray());
         } else {
           spans.push(" ".to_string().white());
         }

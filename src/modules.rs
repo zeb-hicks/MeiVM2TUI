@@ -86,8 +86,8 @@ impl Module {
           0x06 => Some((S!("M").fg(Color::Rgb(128, 128, 128)), S!("Scratch").blue())),
           0x07 => Some((S!("M").fg(Color::Rgb(128, 128, 128)), S!("Scratch").blue())),
 
-          0x08 => Some((S!("CRVx").fg(Color::Rgb(128, 128, 128)), S!("Current Req. Vx").gray())),
-          0x09 => Some((S!("CRVy").fg(Color::Rgb(128, 128, 128)), S!("Current Req. Vy").gray())),
+          0x08 => Some((S!("CRVx").fg(Color::Rgb(128, 128, 128)), S!("Current Rel. Vx").gray())),
+          0x09 => Some((S!("CRVy").fg(Color::Rgb(128, 128, 128)), S!("Current Rel. Vy").gray())),
 
           0x0c => Some((S!("RH").fg(Color::Rgb(128, 128, 128)), S!("Req. Heading").gray())),
           0x0d => Some((S!("M").fg(Color::Rgb(128, 128, 128)), S!("Scratch").blue())),
